@@ -2,8 +2,11 @@
 <mat-grid-list cols="{{this.tiles.length}}" rowHeight="1:1" >
   
   <span *ngFor="let row of tiles">
-    <mat-grid-tile *ngFor="let tile of row"  [style.background]="tile.color" 
-      (click)="putTile(tile)" >
+    <mat-grid-tile *ngFor="let tile of row" 
+      [style.background]="tile.color" 
+      [ngClass]="{'available': isSpotAvailable(tile.x, tile.y)}"
+      (click)="putTile(tile)"
+    >
        [{{tile.x}}, {{tile.y}}]
     </mat-grid-tile>
   </span>

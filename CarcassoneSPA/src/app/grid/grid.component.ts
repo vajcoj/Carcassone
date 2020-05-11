@@ -14,8 +14,8 @@ export class GridComponent implements OnInit {
   constructor(private boardService: BoardService) { }
 
   ngOnInit() {
-
     // TODO: get grid dimensions
+    // TODO: get grid id
 
     this.tiles = Array(10).fill( null ).map(() => Array(10));
     this.availableSpots = Array(10).fill( null ).map(() => Array(10));
@@ -23,7 +23,7 @@ export class GridComponent implements OnInit {
     // draw empty tiles
     for (let i = 0; i < this.tiles.length; i++) {
       for (let j = 0; j < this.tiles[i].length; j++) {
-        this.tiles[j][i] = { x: j, y: i, color: 'white', free: true};
+        this.tiles[j][i] = { x: j, y: i, color: 'beige', occupied: false};
         this.availableSpots[j][i] = false;
       }
     }
@@ -34,46 +34,43 @@ export class GridComponent implements OnInit {
     this.boardService.getAllTiles(1).subscribe(data => {
       data.forEach(tile => {
         this.availableSpots[tile.x][tile.y] = true;
-        tile.free = true;
-        this.putTile(tile);
+        this.placeTile(tile);
       });
     });
 
   }
 
   putTile(tile: Tile) {
-    const x = tile.x;
-    const y = tile.y;
-
-    console.log(`Putting: [${x}, ${y}] - free: ${tile.free}, available: ${this.availableSpots[x][y]}  `);
-
-    if (tile.free && this.availableSpots[x][y]) {
-
-      if (tile.color == null || tile.color === 'white') {
-         tile.color = this.getRandomColor();
-       }
-
-      this.tiles[x][y] = tile;
-      tile.free = false;
-
-      // validate indices (overflow)
-      this.availableSpots[tile.x][tile.y] = false;
-      this.availableSpots[x][y + 1] = this.tiles[x][y + 1].free;
-      this.availableSpots[x][y - 1] = this.tiles[x][y - 1].free;
-      this.availableSpots[x + 1][y] = this.tiles[x + 1][y].free;
-      this.availableSpots[x - 1][y] = this.tiles[x - 1][y].free;
-
+    if (this.isSpotAvailable(tile.x, tile.y)) {
+      this.boardService.putTile(1, tile).subscribe(data => {
+        tile.color = data;
+        this.placeTile(tile);
+      }, error => {
+        // TODO: alertify +
+      });
     }
   }
 
+  placeTile(tile: Tile) {
+    console.log(`Placing tile: [${tile.x}, ${tile.y}] - ${tile.color}`);
 
-  getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    tile.occupied = true;
+    this.tiles[tile.x][tile.y] = tile;
+    this.setAvailableSpots(tile.x, tile.y);
+  }
+
+  setAvailableSpots(x: number, y: number) {
+      this.availableSpots[x][y] = false;
+
+      // TODO: validate indices (overflow)
+      this.availableSpots[x][y + 1] = !this.tiles[x][y + 1].occupied;
+      this.availableSpots[x][y - 1] = !this.tiles[x][y - 1].occupied;
+      this.availableSpots[x + 1][y] = !this.tiles[x + 1][y].occupied;
+      this.availableSpots[x - 1][y] = !this.tiles[x - 1][y].occupied;
+  }
+
+  isSpotAvailable(x: number, y: number) {
+    return this.availableSpots[x][y];
   }
 
 }

@@ -18,7 +18,7 @@ export class BoardService {
   }
 
   putTile(idBoard: number, tile: Tile) {
-
+    return this.http.post(this.baseUrl + 'board/' + idBoard + '/put', tile, {responseType: 'text'});
   }
 
 }
