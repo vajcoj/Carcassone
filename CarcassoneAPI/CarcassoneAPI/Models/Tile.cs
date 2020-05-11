@@ -8,6 +8,7 @@
         public string Color { get; set; }
 
         public Board Board { get; set; }
+        public int BoardId { get; set; }
 
         public Tile()
         {
