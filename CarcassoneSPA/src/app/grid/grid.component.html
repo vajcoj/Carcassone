@@ -1,16 +1,15 @@
 
-<mat-grid-list cols="{{this.tiles.length}}" rowHeight="1:1" >
+<mat-grid-list cols="{{this.width}}" rowHeight="1:1" >
   
-  <span *ngFor="let row of tiles">
-    <mat-grid-tile *ngFor="let tile of row" 
+    <mat-grid-tile *ngFor="let tile of tiles" 
       [style.background]="tile.color" 
       [ngClass]="{'available': isSpotAvailable(tile.x, tile.y)}"
-      (click)="putTile(tile)"
+      (click)="putTile(tile)" 
     >
-       [{{tile.x}}, {{tile.y}}]
+       {{tile.x}}, {{tile.y}}
+       <br>
+       {{this.getIndex(tile.x, tile.y)}}
+
     </mat-grid-tile>
-  </span>
 
 </mat-grid-list>
-
-
