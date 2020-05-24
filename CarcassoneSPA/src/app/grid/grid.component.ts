@@ -11,11 +11,11 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./grid.component.css']
 })
 export class GridComponent implements OnInit {
-  boardId = -1;
+  boardId: number;
   tiles: Tile[];
   availableSpots: boolean[];
-  width = 20;
-  height = 10;
+  width: number;
+  height: number;
   tileToPut: Tile;
 
   constructor(private boardService: BoardService, private alertify: AlertifyService, private route: ActivatedRoute) { }
@@ -65,50 +65,32 @@ export class GridComponent implements OnInit {
     }
   }
 
-  putTile(tile: Tile) { // poslat jen X, Y => a do service pak poslat tiletoput + x +y
+  putTile(x: number, y: number) { // poslat jen X, Y => a do service pak poslat tiletoput + x +y
 
     if (this.tileToPut.tileTypeId === -1) { return; }
 
-    if (this.isSpotAvailable(tile.x, tile.y) && this.isSpotValidForTile(tile.x, tile.y, this.tileToPut)) {
+    if (!this.isSpotAvailable(x, y)) { return; }
 
-      tile.tileTypeId = this.tileToPut.tileTypeId;
-      tile.top = this.tileToPut.top;
-      tile.right = this.tileToPut.right;
-      tile.bottom = this.tileToPut.bottom;
-      tile.left = this.tileToPut.left;
-      tile.rotation = this.tileToPut.rotation;
-      tile.boardId = this.tileToPut.boardId;
+    if (this.isSpotValidForTile(x, y, this.tileToPut)) {
 
-      this.boardService.putTile(this.boardId, tile).subscribe(data => { // TODO: pouzit "data"???
+      this.tileToPut.x = x;
+      this.tileToPut.y = y;
 
-        tile.imageUrl = this.tileToPut.imageUrl;
+      this.boardService.putTile(this.boardId, this.tileToPut).subscribe(data => { // TODO: pouzit "data"???
 
-        this.alertify.success(`[${tile.x}, ${tile.y}] - ` + tile.imageUrl);
+        this.alertify.success(`[${x}, ${y}]`);
 
-        this.placeTile(tile);
+        this.placeTile(this.tileToPut);
 
         this.getNewTile();
 
       }, err => {
-        tile = {
-          x: tile.x,
-          y: tile.y,
-          rotation: 0,
-          imageUrl: 'void',
-          occupied: false,
-          top: TerrainType.Void,
-          right: TerrainType.Void,
-          bottom: TerrainType.Void,
-          left: TerrainType.Void,
-          tileTypeId: -1,
-          boardId: -1
-        };
-
+        // TODO: delete img this.tiles(x,y) = blank tile
         this.alertify.error(err);
       });
 
     } else {
-      this.alertify.error('Cannot put here.'); // todo - vice rozlisit
+      this.alertify.error('Cannot put here.');
     }
   }
 

@@ -6,7 +6,7 @@
       [ngClass]="{'rotation1': tile.rotation === 1, 'rotation2': tile.rotation === 2, 'rotation3': tile.rotation === 3, 
         'available': isSpotAvailable(tile.x, tile.y)}"
       [ngStyle]="{'background-image': 'url(../../assets/img/tiles/' +  tile.imageUrl + '.png)'}"
-      (click)="putTile(tile)" 
+      (click)="putTile(tile.x, tile.y)" 
     >
       <div style="color: red; display: none;">
         <b>
@@ -38,9 +38,7 @@
 
     (click)="rotateTile()">
 
-    {{ this.tileToPut.rotation }}
-
-    <div style="color: red; ">
+    <div style="color: red; display: none;">
       <b>
         top {{ this.tileToPut.top }} <br>
         right {{this.tileToPut.right}}<br>
