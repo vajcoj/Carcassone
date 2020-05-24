@@ -11,6 +11,8 @@ import { HomeComponent } from './home/home.component';
 import { RouterModule } from '@angular/router';
 import { appRoutes } from 'src/routes';
 import { BoardResolver } from './_resolvers/board.resolver';
+import { NewTileResolver } from './_resolvers/new-tile.resolver';
+import { TilesResolver } from './_resolvers/tiles.resolver';
 
 
 @NgModule({
@@ -28,7 +30,9 @@ import { BoardResolver } from './_resolvers/board.resolver';
       RouterModule.forRoot(appRoutes),
    ],
    providers: [
-      BoardResolver
+      BoardResolver,
+      NewTileResolver,
+      TilesResolver
    ],
    bootstrap: [
       AppComponent

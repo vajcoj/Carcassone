@@ -22,41 +22,23 @@ export class GridComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe(data => {
-      console.log(`${data.board.width} X ${data.board.height}`);
 
       this.boardId = data.board.boardId;
       this.width = data.board.width;
       this.height = data.board.height;
-    });
 
-    this.tileToPut = {
-      x: -1,
-      y: -1,
-      rotation: 0,
-      imageUrl: 'void',
-      occupied: false,
-      top: TerrainType.Void,
-      right: TerrainType.Void,
-      bottom: TerrainType.Void,
-      left: TerrainType.Void,
-      tileTypeId: -1,
-      boardId: -1
-    };
+      this.tileToPut = data.newTile;
 
-    this.initTiles(); // await???
-    this.getNewTile();
+      console.log(data.tiles);
 
-    console.log(this.boardId);
+      this.initTiles();
 
-    // place tiles from server
-    this.boardService.getAllTiles(this.boardId).subscribe(data => {
-      data.forEach(tile => {
+      data.tiles.forEach(tile => {
         this.availableSpots[this.getIndex(tile.x, tile.y)] = true;
 
         for (let i = 0; i < tile.rotation; i++) {
-          this.setRotation(tile);
+          this.setRotation(tile); // TODO: delat na serveru
         }
-
         this.placeTile(tile);
       });
     });
@@ -67,9 +49,8 @@ export class GridComponent implements OnInit {
     this.tiles = Array(this.height * this.width).fill({});
     this.availableSpots = Array(this.height * this.width).fill(false);
 
-    this.availableSpots[this.getIndex(3, 3)] = true;
+    this.availableSpots[this.getIndex(3, 3)] = true; // TODO: on new game put first tile
 
-    // create empty tiles ---- TODO: tileservice - create empty tile
     for (let i = 0; i < this.tiles.length; i++) {
       const x = i % this.width;
       const y = Math.floor(i / this.width);
@@ -106,9 +87,9 @@ export class GridComponent implements OnInit {
 
       this.boardService.putTile(this.boardId, tile).subscribe(data => { // TODO: pouzit "data"???
 
-        this.alertify.success(`[${tile.x}, ${tile.y}] - ` + tile.imageUrl);
-
         tile.imageUrl = this.tileToPut.imageUrl;
+
+        this.alertify.success(`[${tile.x}, ${tile.y}] - ` + tile.imageUrl);
 
         this.placeTile(tile);
 

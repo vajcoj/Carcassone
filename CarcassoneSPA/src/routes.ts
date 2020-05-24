@@ -3,6 +3,8 @@ import { Routes } from '@angular/router';
 import { GridComponent } from './app/grid/grid.component';
 import { BoardResolver } from './app/_resolvers/board.resolver';
 import { HomeComponent } from './app/home/home.component';
+import { NewTileResolver } from './app/_resolvers/new-tile.resolver';
+import { TilesResolver } from './app/_resolvers/tiles.resolver';
 
 
 export const appRoutes: Routes = [
@@ -16,7 +18,7 @@ export const appRoutes: Routes = [
       {
         path: 'board/:boardId',
         component: GridComponent,
-        resolve: { board: BoardResolver }
+        resolve: { board: BoardResolver, newTile: NewTileResolver, tiles: TilesResolver }
       }
 
     ]
