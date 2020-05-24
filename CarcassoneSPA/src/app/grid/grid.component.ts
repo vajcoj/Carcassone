@@ -28,21 +28,15 @@ export class GridComponent implements OnInit {
       this.height = data.board.height;
 
       this.tileToPut = data.newTile;
-
-      console.log(data.tiles);
+      this.tileToPut.rotation = 0;
 
       this.initTiles();
 
       data.tiles.forEach(tile => {
         this.availableSpots[this.getIndex(tile.x, tile.y)] = true;
-
-        for (let i = 0; i < tile.rotation; i++) {
-          this.setRotation(tile); // TODO: delat na serveru
-        }
         this.placeTile(tile);
       });
     });
-
   }
 
   initTiles() {
@@ -205,27 +199,7 @@ export class GridComponent implements OnInit {
     return (this.width * y + x);
   }
 
-  setRotation(tile: Tile) {
-    tile.rotation = (tile.rotation) % 4;
-
-    const oldTop = tile.top;
-    tile.top = tile.left;
-    tile.left = tile.bottom;
-    tile.bottom = tile.right;
-    tile.right = oldTop;
-  }
-
-  rotatte(tile: Tile) {
-    tile.rotation = (tile.rotation + 1) % 4;
-
-    const oldTop = tile.top;
-    tile.top = tile.left;
-    tile.left = tile.bottom;
-    tile.bottom = tile.right;
-    tile.right = oldTop;
-  }
-
-  rotateTileToPut() {
+  rotateTile() {
     this.tileToPut.rotation = (this.tileToPut.rotation + 1) % 4;
 
     const oldTop = this.tileToPut.top;
