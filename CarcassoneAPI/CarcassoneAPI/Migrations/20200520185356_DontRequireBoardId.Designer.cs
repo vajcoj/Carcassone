@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarcassoneAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200520114535_CreateBasicModel")]
-    partial class CreateBasicModel
+    [Migration("20200520185356_DontRequireBoardId")]
+    partial class DontRequireBoardId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -178,18 +178,18 @@ namespace CarcassoneAPI.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ParentComponentTileTypeComponentId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TerrainType")
                         .HasColumnType("int");
 
                     b.Property<int>("TileComponentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TileTypeComponentId")
+                        .HasColumnType("int");
+
                     b.HasKey("TileTypeId", "Position");
 
-                    b.HasIndex("ParentComponentTileTypeComponentId");
+                    b.HasIndex("TileTypeComponentId");
 
                     b.ToTable("TileTypeTerrains");
                 });
@@ -223,8 +223,7 @@ namespace CarcassoneAPI.Migrations
                     b.HasOne("CarcassoneAPI.Models.BoardComponent", "BoardComponent")
                         .WithMany("Components")
                         .HasForeignKey("BoardComponentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CarcassoneAPI.Models.Tile", "Tile")
                         .WithMany("Components")
@@ -250,9 +249,9 @@ namespace CarcassoneAPI.Migrations
 
             modelBuilder.Entity("CarcassoneAPI.Models.TileTypeTerrain", b =>
                 {
-                    b.HasOne("CarcassoneAPI.Models.TileTypeComponent", "ParentComponent")
+                    b.HasOne("CarcassoneAPI.Models.TileTypeComponent", "TileTypeComponent")
                         .WithMany("Terrains")
-                        .HasForeignKey("ParentComponentTileTypeComponentId");
+                        .HasForeignKey("TileTypeComponentId");
 
                     b.HasOne("CarcassoneAPI.Models.TileType", "TileType")
                         .WithMany("Terrains")

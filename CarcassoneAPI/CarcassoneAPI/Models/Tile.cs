@@ -6,7 +6,7 @@ namespace CarcassoneAPI.Models
     public class Tile
     {
         public int TileId { get; set; }
-        public int X { get; set; }
+        public int X { get; set; } // not null!!!
         public int Y { get; set; }
         public int Rotation { get; set; }
         public string Color { get; set; } // TODO remove
@@ -20,5 +20,17 @@ namespace CarcassoneAPI.Models
         public int TileTypeId { get; set; }
 
 
+    }
+
+    public static class TileExtensions
+    {
+        public static TerrainType GetTerrain(this Tile tile, TilePosition position)
+        {
+            var terr = tile.TileType.Terrains.Where(t => t.Position.Rotate(tile.Rotation) == position).FirstOrDefault();
+
+            var ret = terr != null ? terr.TerrainType : TerrainType.Void;
+
+            return ret;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using AutoMapper;
 using CarcassoneAPI.Data;
 using CarcassoneAPI.Helpers;
 using CarcassoneAPI.Services;
@@ -29,16 +30,23 @@ namespace CarcassoneAPI
         {
             services.AddDbContext<DataContext>(con => con.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            //services.AddDbContext<DataContext>(ServiceLifetime.Transient);
+
             services.AddScoped<IBoardService, BoardService>();
+            services.AddScoped<ITileTypeService, TileTypeService>();
 
             services.AddControllers();
-
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Carcassone API", Version = "v1" });
             });
 
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
+
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -14,5 +14,8 @@ namespace CarcassoneAPI.Models
 
         public TileType TileType { get; set; }
         public int TileTypeId { get; set; }
+
+        //public virtual ICollection<TileComponent> TileComponent { get; set; }
+
     }
 }

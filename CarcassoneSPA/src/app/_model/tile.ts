@@ -1,7 +1,18 @@
 export interface Tile {
     x: number;
     y: number;
-    color: string;
+    rotation: number;
+
+    tileTypeId: number;
+    boardId: number;
+
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+
+    imageUrl: string;
+
     occupied?: boolean;
-    board?: any; // TODO: create DTO
+
 }

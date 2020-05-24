@@ -2,41 +2,44 @@
 {
     public enum TilePosition
     {
-        TOP_LEFT,
-        TOP,
-        TOP_RIGHT,
+        Center,
 
-        RIGHT_TOP,
-        RIGHT,
-        RIGHT_BOTTOM,
+        TopLeft,
+        Top,
+        TopRight,
 
-        BOTTOM_RIGHT,
-        BOTTOM,
-        BOTTOM_LEFT,
+        RightTop,
+        Right,
+        RightBottom,
 
-        LEFT_BOTTOM,
-        LEFT,
-        LEFT_TOP,
+        BottomRight,
+        Bottom,
+        BottomLeft,
 
-        CENTER 
+        LeftBottom,
+        Left,
+        LeftTop
     }
-
-    // top, up, left, right - one of - pro zjisteni, jestli je napojena
-
-    // extension metoda na rotate
 
     public static class TilePositionExtensions
     {
+        private static TilePosition Rotate(this TilePosition position)
+        {
+            if (position == TilePosition.Center) return TilePosition.Center;
+
+            return (TilePosition) (((int)position + 3) % 12);
+        }
+
         public static TilePosition Rotate(this TilePosition position, int rotation)
         {
+            rotation %= 4;
 
+            for (int i = 0; i < rotation; i++)
+            {
+                position = position.Rotate();
+            }
 
-
-            rotation = rotation % 4;
-
-            // for
-
-            return TilePosition.BOTTOM;
+            return position;
         }
 
     }

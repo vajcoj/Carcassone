@@ -2,9 +2,11 @@
 {
     public enum TerrainType
     {
+        Void = -1,
         Road,
         Castle,
-        Meadow,
+        Field,
         Monastery // slo by nejak vypalit event?
     }
+
 }

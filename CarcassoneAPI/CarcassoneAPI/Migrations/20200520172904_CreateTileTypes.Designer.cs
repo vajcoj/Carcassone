@@ -4,14 +4,16 @@ using CarcassoneAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CarcassoneAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200520172904_CreateTileTypes")]
+    partial class CreateTileTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,7 +112,7 @@ namespace CarcassoneAPI.Migrations
                     b.Property<int>("TileTypeComponentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BoardComponentId")
+                    b.Property<int>("BoardComponentId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsOpen")
@@ -221,7 +223,8 @@ namespace CarcassoneAPI.Migrations
                     b.HasOne("CarcassoneAPI.Models.BoardComponent", "BoardComponent")
                         .WithMany("Components")
                         .HasForeignKey("BoardComponentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CarcassoneAPI.Models.Tile", "Tile")
                         .WithMany("Components")

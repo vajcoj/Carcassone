@@ -1,9 +1,9 @@
-﻿using CarcassoneAPI.Helpers;
+﻿using AutoMapper;
+using CarcassoneAPI.DTOs;
 using CarcassoneAPI.Models;
 using CarcassoneAPI.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Drawing;
 using System.Threading.Tasks;
 
 namespace CarcassoneAPI.Controllers
@@ -13,26 +13,47 @@ namespace CarcassoneAPI.Controllers
     public class BoardController : ControllerBase
     {
         private readonly IBoardService _boardService;
+        private readonly ITileTypeService _tileTypeService;
+        private readonly IMapper _mapper;
 
-        public BoardController(IBoardService boardService)
+        public BoardController(IBoardService boardService, ITileTypeService tileTypeService, IMapper mapper)
         {
             _boardService = boardService;
+            _tileTypeService = tileTypeService;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllTiles(int id)
         {
+            //await _tileTypeService.CreateTileType();
+
             var tiles = await _boardService.GetAllTilesOfBoard(id);
+
             return Ok(tiles);
         }
 
+        [HttpPost("getNewTile")]
+        public async Task<IActionResult> GetNewTile(int id)
+        {
+            var tileToPut = await _boardService.GetTileToPut(id);
+
+            // return empty tile on game end
+
+            tileToPut.BoardId = id;
+
+            return Ok(tileToPut);
+
+        }
+
+
         [HttpPost("put")]
-        public async Task<IActionResult> PutTile(int id, Tile tile)
+        public async Task<IActionResult> PutTile(int id, TilePutted tile)
         {
             // TODO unauthorized
+            // validate indices
 
-            tile.Color = ColorsHelper.GetRandomKnownColor();
-            tile.BoardId = id;
+            // validate tile.BoardId = id;
 
             var tileFromRepo = await _boardService.GetTile(id, tile.X, tile.Y);
 
@@ -41,9 +62,16 @@ namespace CarcassoneAPI.Controllers
                 return BadRequest("Tile at these coordinates already exists.");
             }
 
-            if (await _boardService.PutTile(tile))
+            if (!await _boardService.ValidateTerrain(id, tile))
             {
-                return Ok(tile.Color);
+                return BadRequest("Cannot put here. Terrain not valid.");
+            }
+
+            Tile record = _mapper.Map<TilePutted, Tile>(tile);
+
+            if (await _boardService.PutTile(record))
+            {
+                return Ok(); // CreatedAt
             }
 
             // TODO global exception handler
