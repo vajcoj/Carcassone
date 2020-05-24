@@ -147,5 +147,17 @@ namespace CarcassoneAPI.Services
 
             return true;
         }
+
+        public async Task<bool> CreateBoard(Board board)
+        {
+            _context.Boards.Add(board);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<Board> GetBoard(int boardId)
+        {
+            return await _context.Boards.FirstOrDefaultAsync(b => b.BoardId == boardId);
+        }
     }
 }

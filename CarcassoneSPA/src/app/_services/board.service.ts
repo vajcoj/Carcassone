@@ -12,9 +12,15 @@ export class BoardService {
 
   constructor(private http: HttpClient) { }
 
-  getAllTiles(idBoard: number) {
+  getBoard(idBoard: number) {
     return this.http.get<Tile[]>(
       this.baseUrl + 'board/' + idBoard
+    );
+  }
+
+  getAllTiles(idBoard: number) {
+    return this.http.get<Tile[]>(
+      this.baseUrl + 'board/' + idBoard + '/tiles'
     );
   }
 

@@ -7,20 +7,29 @@ import { GridComponent } from './grid/grid.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { HomeComponent } from './home/home.component';
+import { RouterModule } from '@angular/router';
+import { appRoutes } from 'src/routes';
+import { BoardResolver } from './_resolvers/board.resolver';
+
 
 @NgModule({
    declarations: [
       AppComponent,
       GridComponent,
-      NavbarComponent
+      NavbarComponent,
+      HomeComponent
    ],
    imports: [
       BrowserModule,
       BrowserAnimationsModule,
       MatGridListModule,
       HttpClientModule,
+      RouterModule.forRoot(appRoutes),
    ],
-   providers: [],
+   providers: [
+      BoardResolver
+   ],
    bootstrap: [
       AppComponent
    ]

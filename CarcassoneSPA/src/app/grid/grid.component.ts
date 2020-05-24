@@ -3,6 +3,7 @@ import { Tile } from '../_model/tile';
 import { BoardService } from '../_services/board.service';
 import { AlertifyService } from '../_services/alertify.service';
 import { TerrainType } from '../_model/terrain-type.enum';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-grid',
@@ -10,16 +11,24 @@ import { TerrainType } from '../_model/terrain-type.enum';
   styleUrls: ['./grid.component.css']
 })
 export class GridComponent implements OnInit {
+  boardId = -1;
   tiles: Tile[];
   availableSpots: boolean[];
-  width = 16;
-  height = 6;
+  width = 20;
+  height = 10;
   tileToPut: Tile;
 
-  constructor(private boardService: BoardService, private alertify: AlertifyService) { }
+  constructor(private boardService: BoardService, private alertify: AlertifyService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    // TODO: resolver get grid id and W/H
+    this.route.data.subscribe(data => {
+      console.log(`${data.board.width} X ${data.board.height}`);
+
+      this.boardId = data.board.boardId;
+      this.width = data.board.width;
+      this.height = data.board.height;
+    });
+
     this.tileToPut = {
       x: -1,
       y: -1,
@@ -37,8 +46,10 @@ export class GridComponent implements OnInit {
     this.initTiles(); // await???
     this.getNewTile();
 
+    console.log(this.boardId);
+
     // place tiles from server
-    this.boardService.getAllTiles(1).subscribe(data => {
+    this.boardService.getAllTiles(this.boardId).subscribe(data => {
       data.forEach(tile => {
         this.availableSpots[this.getIndex(tile.x, tile.y)] = true;
 
@@ -93,7 +104,7 @@ export class GridComponent implements OnInit {
       tile.rotation = this.tileToPut.rotation;
       tile.boardId = this.tileToPut.boardId;
 
-      this.boardService.putTile(1, tile).subscribe(data => { // TODO: pouzit "data"???
+      this.boardService.putTile(this.boardId, tile).subscribe(data => { // TODO: pouzit "data"???
 
         this.alertify.success(`[${tile.x}, ${tile.y}] - ` + tile.imageUrl);
 
@@ -122,7 +133,7 @@ export class GridComponent implements OnInit {
       });
 
     } else {
-      this.alertify.error('Cannot put here.');
+      this.alertify.error('Cannot put here.'); // todo - vice rozlisit
     }
   }
 
@@ -159,7 +170,7 @@ export class GridComponent implements OnInit {
   }
 
   getNewTile() {
-    this.boardService.getNewTile(1).subscribe(newTile => {
+    this.boardService.getNewTile(this.boardId).subscribe(newTile => {
       this.tileToPut = newTile;
       this.tileToPut.rotation = 0;
     });

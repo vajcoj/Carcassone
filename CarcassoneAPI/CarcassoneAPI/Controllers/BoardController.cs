@@ -23,7 +23,18 @@ namespace CarcassoneAPI.Controllers
             _mapper = mapper;
         }
 
+
         [HttpGet]
+        public async Task<IActionResult> GetBoard(int id)
+        {
+            ////await _tileTypeService.CreateTileType();
+
+            var board = await _boardService.GetBoard(id);
+
+            return Ok(board);
+        }
+
+        [HttpGet("tiles")]
         public async Task<IActionResult> GetAllTiles(int id)
         {
             //await _tileTypeService.CreateTileType();

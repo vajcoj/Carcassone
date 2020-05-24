@@ -12,5 +12,7 @@ namespace CarcassoneAPI.Services.Interface
         Task<bool> PutTile(Tile tile);
         Task<TileToPut> GetTileToPut(int boardId);
         Task<bool> ValidateTerrain(int boardId, TilePutted tile);
+        Task<bool> CreateBoard(Board board);
+        Task<Board> GetBoard(int boardId);
     }
 }
