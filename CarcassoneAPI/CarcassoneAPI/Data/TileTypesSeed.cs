@@ -125,6 +125,37 @@ namespace CarcassoneAPI.Data
                     new List<TilePosition> { TilePosition.LeftBottom, TilePosition.RightBottom, TilePosition.Bottom } // field under road
                 ),
 
+                new TileType("Castle2Road2", "castle2road2", 2,
+                    TerrainType.Field,
+                    TerrainType.Castle, TerrainType.Castle, TerrainType.Castle,
+                    TerrainType.Castle, TerrainType.Castle, TerrainType.Castle,
+                    TerrainType.Field, TerrainType.Road, TerrainType.Field,
+                    TerrainType.Field, TerrainType.Road, TerrainType.Field,
+                    new List<TilePosition> { TilePosition.Top, TilePosition.Right }, // castle
+                    new List<TilePosition> { TilePosition.Bottom, TilePosition.Left }, // road
+                    new List<TilePosition> { TilePosition.BottomLeft, TilePosition.LeftBottom }, // field under road
+                    new List<TilePosition> { TilePosition.LeftTop, TilePosition.BottomRight } // field above road
+                ),
+
+                new TileType("Monastery1", "monastery1", 2,
+                    TerrainType.Monastery,
+                    TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    new List<TilePosition> { TilePosition.Top, TilePosition.Right, TilePosition.Left, TilePosition.Bottom } // field
+               ),
+
+               new TileType("Monastery2", "monastery2", 2,
+                    TerrainType.Monastery,
+                    TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    TerrainType.Field, TerrainType.Road, TerrainType.Field,
+                    TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    new List<TilePosition> { TilePosition.Top, TilePosition.Right, TilePosition.Left, TilePosition.BottomLeft, TilePosition.BottomRight }, // field
+                    new List<TilePosition> { TilePosition.Bottom } // road B
+               ),
+
 
             };
         }
