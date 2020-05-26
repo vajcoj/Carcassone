@@ -13,6 +13,8 @@ import { appRoutes } from 'src/routes';
 import { BoardResolver } from './_resolvers/board.resolver';
 import { NewTileResolver } from './_resolvers/new-tile.resolver';
 import { TilesResolver } from './_resolvers/tiles.resolver';
+import { TileComponent } from './tile/tile.component';
+
 
 
 @NgModule({
@@ -20,14 +22,15 @@ import { TilesResolver } from './_resolvers/tiles.resolver';
       AppComponent,
       GridComponent,
       NavbarComponent,
-      HomeComponent
+      HomeComponent,
+      TileComponent
    ],
    imports: [
       BrowserModule,
       BrowserAnimationsModule,
       MatGridListModule,
       HttpClientModule,
-      RouterModule.forRoot(appRoutes),
+      RouterModule.forRoot(appRoutes)
    ],
    providers: [
       BoardResolver,

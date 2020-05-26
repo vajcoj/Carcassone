@@ -14,6 +14,7 @@ export class GridComponent implements OnInit {
   boardId: number;
   tiles: Tile[];
   availableSpots: boolean[];
+  hoverIdx: number;
   width: number;
   height: number;
   tileToPut: Tile;

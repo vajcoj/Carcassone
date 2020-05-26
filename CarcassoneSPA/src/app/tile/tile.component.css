@@ -1,0 +1,22 @@
+.tile {
+    width: 100%;
+    height: 100%;  
+    background-size: cover;
+}
+
+.available:hover {
+    background-color: #7e00cc !important;
+    color: red;
+} 
+
+.rotation1 {
+    transform: rotate(90deg);
+}
+
+.rotation2 {
+    transform: rotate(180deg);
+}
+
+.rotation3 {
+    transform: rotate(270deg);
+}

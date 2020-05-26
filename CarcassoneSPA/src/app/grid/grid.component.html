@@ -1,27 +1,17 @@
 <mat-grid-list cols="{{this.width}}" rowHeight="1:1" >
   
-    <mat-grid-tile *ngFor="let tile of tiles" 
-      class="tile"
-      
-      [ngClass]="{'rotation1': tile.rotation === 1, 'rotation2': tile.rotation === 2, 'rotation3': tile.rotation === 3, 
-        'available': isSpotAvailable(tile.x, tile.y)}"
-      [ngStyle]="{'background-image': 'url(../../assets/img/tiles/' +  tile.imageUrl + '.png)'}"
-      (click)="putTile(tile.x, tile.y)" 
-    >
-      <div style="color: red; display: none;">
-        <b>
-          ____top {{ tile.top }} <br>
-          left {{tile.left}} .... right {{tile.right}}<br>
-          ____bott {{ tile.bottom }} <br>
-          
-        </b>
-      </div>
-      <div style="color: red; display: none;">
-        <b>
-          {{tile.x}}, {{tile.y}}
-        </b>
-      </div>
-      
+    <mat-grid-tile *ngFor="let tile of tiles" (click)="putTile(tile.x, tile.y)"
+      (mouseenter)="hoverIdx = getIndex(tile.x, tile.y)"
+      (mouseleave)="hoverIdx = -1"
+     >
+
+      <app-tile [tile]="tile" 
+        *ngIf=" hoverIdx !== getIndex(tile.x, tile.y) || !isSpotAvailable(tile.x, tile.y)  else nextTile">
+      </app-tile>
+     
+      <ng-template #nextTile>
+        <app-tile [tile]="this.tileToPut" ></app-tile>
+      </ng-template>
 
     </mat-grid-tile>
 
@@ -29,24 +19,9 @@
 
 <br>
 
-
-  <div class="tile preview" style="width: 150px; margin: auto; height: 150px;"
-   
-    [ngStyle]="{'background-image': 'url(../../assets/img/tiles/' +  this.tileToPut.imageUrl + '.png)'}"
-
-    [ngClass]="{'rotation1': this.tileToPut.rotation === 1, 'rotation2': this.tileToPut.rotation === 2, 'rotation3': this.tileToPut.rotation === 3}"
-
-    (click)="rotateTile()">
-
-    <div style="color: red; display: none;">
-      <b>
-        top {{ this.tileToPut.top }} <br>
-        right {{this.tileToPut.right}}<br>
-        bott {{ this.tileToPut.bottom }} <br>
-        left {{this.tileToPut.left}}
-      </b>
-    </div>
-  </div>
+<div class="tile preview" style="width: 150px; margin: auto; height: 150px;" (click)="rotateTile()">
+  <app-tile [tile]="this.tileToPut" ></app-tile>
+</div>
 
 
 

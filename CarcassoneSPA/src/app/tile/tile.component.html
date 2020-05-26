@@ -1,0 +1,25 @@
+<div class="tile"     
+    [ngClass]="{'available': this.available, 'rotation1': tile.rotation === 1, 'rotation2': tile.rotation === 2, 'rotation3': tile.rotation === 3}" 
+    [ngStyle]="{'background-image': 'url(../../assets/img/tiles/' +  tile.imageUrl + '.png)'}"
+    (mouseenter)="hover = true"
+    (mouseleave)="hover = false"
+>
+
+    <div style="color: red; display: none;">
+        <b>
+          {{ tile.top }} <br>
+          left {{tile.left}}<br>
+          right {{tile.right}}<br>
+          bott {{ tile.bottom }}
+          
+        </b>
+      </div>
+      <div style="color: red; display: none;">
+        <b>
+          {{tile.x}}, {{tile.y}}
+        </b>
+      </div>
+
+</div>
+
+
