@@ -2,7 +2,7 @@
 
 namespace CarcassoneAPI.DTOs
 {
-    public class TileToPut
+    public class TileToPutDTO
     {
         public int BoardId { get; set; }
         public int TileTypeId { get; set; }

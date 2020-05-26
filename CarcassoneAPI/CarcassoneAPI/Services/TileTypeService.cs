@@ -1,9 +1,5 @@
 ﻿using CarcassoneAPI.Data;
-using CarcassoneAPI.Models;
 using CarcassoneAPI.Services.Interface;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CarcassoneAPI.Services
@@ -16,7 +12,8 @@ namespace CarcassoneAPI.Services
         {
             _context = context;
         }
-        public async Task<bool> CreateTileType()
+
+        public async Task<bool> SeedTileTypes()
         {
             var types = TileTypesSeed.GetTileTypes();
 
@@ -25,14 +22,5 @@ namespace CarcassoneAPI.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-
-
-        public async  Task<TileType> GetFirst()
-        {
-            return await _context.TileTypes
-                .Include(t => t.Terrains)
-                .Include(t => t.Components)
-                .FirstOrDefaultAsync();
-        }
     }
 }

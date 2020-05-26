@@ -5,8 +5,7 @@ namespace CarcassoneAPI.Services.Interface
 {
     public interface ITileTypeService
     {
-        Task<bool> CreateTileType();
+        Task<bool> SeedTileTypes();
 
-        Task<TileType> GetFirst();
     }
 }

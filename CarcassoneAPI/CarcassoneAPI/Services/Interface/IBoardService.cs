@@ -7,11 +7,11 @@ namespace CarcassoneAPI.Services.Interface
 {
     public interface IBoardService
     {
-        Task<IEnumerable<TilePutted>> GetAllTilesOfBoard(int boardId);
+        Task<IEnumerable<TilePuttedDTO>> GetAllTilesOfBoard(int boardId);
         Task<Tile> GetTile(int boardId, int x, int y);
         Task<bool> PutTile(Tile tile);
-        Task<TileToPut> GetTileToPut(int boardId);
-        Task<bool> ValidateTerrain(int boardId, TilePutted tile);
+        Task<TileToPutDTO> GetTileToPut(int boardId);
+        Task<bool> ValidateTerrain(int boardId, TilePuttedDTO tile);
         Task<bool> CreateBoard(Board board);
         Task<Board> GetBoard(int boardId);
     }

@@ -22,13 +22,14 @@ namespace CarcassoneAPI.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TilePutted>> GetAllTilesOfBoard(int boardId)
+        public async Task<IEnumerable<TilePuttedDTO>> GetAllTilesOfBoard(int boardId)
         {
             var tiles =  await _context.Tiles
                 .Include(t => t.TileType)
                 .Include(t => t.TileType.Terrains)
                 .Where(w => w.Board.BoardId == boardId)
-                .Select(tile => _mapper.Map<Tile, TilePutted>(tile))
+                .Select(tile => _mapper.Map<Tile, TilePuttedDTO>(tile))
+                .AsNoTracking()
                 .ToListAsync();
 
             return tiles;
@@ -45,7 +46,7 @@ namespace CarcassoneAPI.Services
             return tile;
         }
 
-        public async Task<TileToPut> GetTileToPut(int boardId)
+        public async Task<TileToPutDTO> GetTileToPut(int boardId)
         {
             var availableTypes = GetAvailableTileTypes(boardId);
 
@@ -55,12 +56,12 @@ namespace CarcassoneAPI.Services
 
             // TODO: check null
 
-            var toPut = _mapper.Map<TileType, TileToPut>(type);
+            var toPut = _mapper.Map<TileType, TileToPutDTO>(type);
             
 
             if (toPut == null)
             {
-                toPut = new TileToPut
+                toPut = new TileToPutDTO
                 {
                     TileTypeId = -1,
                     ImageUrl = "void"
@@ -87,7 +88,8 @@ namespace CarcassoneAPI.Services
                     usedTypeIds.GroupBy(i => i)
                         .Where(g => g.Key == type.TileTypeId)
                         .Select(g => g.Count()).FirstOrDefault() < type.Count
-                 );
+                 )
+                .AsNoTracking();
 
             return availableTypes;
         }
@@ -114,7 +116,7 @@ namespace CarcassoneAPI.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> ValidateTerrain(int boardId, TilePutted tile)
+        public async Task<bool> ValidateTerrain(int boardId, TilePuttedDTO tile)
         {
             var x = tile.X;
             var y = tile.Y;

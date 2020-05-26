@@ -23,11 +23,10 @@ namespace CarcassoneAPI.Controllers
             _mapper = mapper;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetBoard(int id)
         {
-            ////await _tileTypeService.CreateTileType();
+            //await _tileTypeService.SeedTileTypes();
 
             var board = await _boardService.GetBoard(id);
 
@@ -35,7 +34,7 @@ namespace CarcassoneAPI.Controllers
         }
 
         [HttpGet("tiles")]
-        public async Task<IActionResult> GetAllTiles(int id)
+        public async Task<IActionResult> GetAllTilesOfBoard(int id)
         {
             //await _tileTypeService.CreateTileType();
 
@@ -45,7 +44,7 @@ namespace CarcassoneAPI.Controllers
         }
 
         [HttpPost("getNewTile")]
-        public async Task<IActionResult> GetNewTile(int id)
+        public async Task<IActionResult> GetNextTile(int id)
         {
             var tileToPut = await _boardService.GetTileToPut(id);
 
@@ -59,7 +58,7 @@ namespace CarcassoneAPI.Controllers
 
 
         [HttpPost("put")]
-        public async Task<IActionResult> PutTile(int id, TilePutted tile)
+        public async Task<IActionResult> PutTile(int id, TilePuttedDTO tile)
         {
             // TODO unauthorized
             // validate indices
@@ -78,12 +77,16 @@ namespace CarcassoneAPI.Controllers
                 return BadRequest("Cannot put here. Terrain not valid.");
             }
 
-            Tile record = _mapper.Map<TilePutted, Tile>(tile);
+            Tile record = _mapper.Map<TilePuttedDTO, Tile>(tile);
 
             if (await _boardService.PutTile(record))
             {
                 return Ok(); // CreatedAt
             }
+
+            // check components -> connect components
+
+
 
             // TODO global exception handler
             throw new Exception("Putting tile failed on save.");

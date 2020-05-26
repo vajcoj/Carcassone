@@ -32,8 +32,8 @@ namespace CarcassoneAPI
 
             //services.AddDbContext<DataContext>(ServiceLifetime.Transient);
 
-            services.AddScoped<IBoardService, BoardService>();
-            services.AddScoped<ITileTypeService, TileTypeService>();
+            services.AddTransient<IBoardService, BoardService>();
+            services.AddTransient<ITileTypeService, TileTypeService>();
 
             services.AddControllers();
 

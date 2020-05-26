@@ -8,11 +8,11 @@ namespace CarcassoneAPI.Helpers
     {
         public AutoMapperProfiles()
         {
-            CreateMap<TilePutted, Tile>();
+            CreateMap<TilePuttedDTO, Tile>();
             
 
             // get all tiles of board
-            CreateMap<Tile, TilePutted>()
+            CreateMap<Tile, TilePuttedDTO>()
                 .ForMember(putted => putted.ImageUrl,
                     opt => opt.MapFrom(tile => tile.TileType.ImageUrl))
                 .ForMember(dest => dest.Top,
@@ -25,7 +25,7 @@ namespace CarcassoneAPI.Helpers
                     opt => opt.MapFrom(tile => tile.GetTerrain(TilePosition.Left)));
 
             // tile to put
-            CreateMap<TileType, TileToPut>()
+            CreateMap<TileType, TileToPutDTO>()
                 .ForMember(dest => dest.Top,
                     opt => opt.MapFrom(tile => tile.Top()))
                 .ForMember(dest => dest.Right,
