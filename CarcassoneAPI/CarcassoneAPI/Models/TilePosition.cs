@@ -1,4 +1,6 @@
-﻿namespace CarcassoneAPI.Models
+﻿using System;
+
+namespace CarcassoneAPI.Models
 {
     public enum TilePosition
     {
@@ -27,7 +29,14 @@
         {
             if (position == TilePosition.Center) return TilePosition.Center;
 
-            return (TilePosition) (((int)position + 3) % 12);
+            position += 3;
+
+            if ((int)position > 12)
+            {
+                position = (TilePosition) ((int)position % 12);
+            }
+
+            return position;
         }
 
         public static TilePosition Rotate(this TilePosition position, int rotation)
@@ -40,6 +49,33 @@
             }
 
             return position;
+        }
+
+        public static TilePosition GetOpposite(this TilePosition position)
+        {
+            if (position == TilePosition.Center) return TilePosition.Center;
+
+            return (TilePosition)(((int)position + 6) % 12);
+        }
+
+        public static TilePosition GetPositionLeftOfMiddle(this TilePosition position)
+        {
+            if (position != TilePosition.Top && position != TilePosition.Right && position != TilePosition.Bottom && position != TilePosition.Left)
+            {
+                throw new Exception("Cannot find left/right position. You must pass one of middle terrains");
+            }
+
+            return (TilePosition)((int)position - 1);
+        }
+
+        public static TilePosition GetPositionRightOfMiddle(this TilePosition position)
+        {
+            if (position != TilePosition.Top && position != TilePosition.Right && position != TilePosition.Bottom && position != TilePosition.Left)
+            {
+                throw new Exception("Cannot find left/right position. You must pass one of middle terrains");
+            }
+
+            return (TilePosition)((int)position + 1);
         }
 
     }
