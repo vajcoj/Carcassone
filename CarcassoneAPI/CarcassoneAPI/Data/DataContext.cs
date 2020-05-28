@@ -19,18 +19,16 @@ namespace CarcassoneAPI.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Board>().Property(b => b.Width).IsRequired();
+            builder.Entity<Board>().Property(b => b.Height).IsRequired();
+            builder.Entity<Board>().Property(b => b.Name).HasMaxLength(128);
 
-            builder.Entity<Board>()
-                .Property(b => b.Name).HasMaxLength(128);
+            builder.Entity<TileType>().Property(b => b.Name).HasMaxLength(128);
+            builder.Entity<TileType>().Property(b => b.ImageUrl).HasMaxLength(128);
 
-            builder.Entity<TileType>()
-                .Property(b => b.Name).HasMaxLength(128);
-
-            builder.Entity<TileType>()
-                .Property(b => b.ImageUrl).HasMaxLength(128);
-
-            builder.Entity<Tile>()
-                .HasIndex(t => new { t.BoardId, t.X, t.Y }).IsUnique();
+            builder.Entity<Tile>().HasIndex(t => new { t.BoardId, t.X, t.Y }).IsUnique();
+            builder.Entity<Tile>().Property(t => t.X).IsRequired();
+            builder.Entity<Tile>().Property(t => t.Y).IsRequired();
 
             builder.Entity<Tile>()
                 .HasOne(t => t.Board)
@@ -46,11 +44,14 @@ namespace CarcassoneAPI.Data
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
 
-            builder.Entity<TileTypeTerrain>()
-                .HasKey(k => new { k.TileTypeId, k.Position });
+            builder.Entity<TileTypeTerrain>().Property(t => t.TerrainType).IsRequired();
+            builder.Entity<TileTypeTerrain>().Property(t => t.Position).IsRequired();
 
-            builder.Entity<TileComponent>()
-                .HasKey(k => new { k.TileId, k.TileTypeComponentId });
+            //builder.Entity<TileTypeTerrain>()
+            //    .HasKey(k => new { k.TileTypeId, k.Position });
+
+            //builder.Entity<TileComponent>()
+            //    .HasKey(k => new { k.TileId, k.TileTypeComponentId });
 
             builder.Entity<TileComponent>()
                 .HasOne(c => c.Tile)

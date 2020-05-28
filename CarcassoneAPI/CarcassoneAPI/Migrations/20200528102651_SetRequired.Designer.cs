@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarcassoneAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200520185640_pok")]
-    partial class pok
+    [Migration("20200528102651_SetRequired")]
+    partial class SetRequired
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -106,11 +106,10 @@ namespace CarcassoneAPI.Migrations
 
             modelBuilder.Entity("CarcassoneAPI.Models.TileComponent", b =>
                 {
-                    b.Property<int>("TileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TileTypeComponentId")
-                        .HasColumnType("int");
+                    b.Property<int>("TileComponentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("BoardComponentId")
                         .HasColumnType("int");
@@ -118,9 +117,17 @@ namespace CarcassoneAPI.Migrations
                     b.Property<bool>("IsOpen")
                         .HasColumnType("bit");
 
-                    b.HasKey("TileId", "TileTypeComponentId");
+                    b.Property<int>("TileId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TileTypeComponentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TileComponentId");
 
                     b.HasIndex("BoardComponentId");
+
+                    b.HasIndex("TileId");
 
                     b.HasIndex("TileTypeComponentId");
 
@@ -172,8 +179,10 @@ namespace CarcassoneAPI.Migrations
 
             modelBuilder.Entity("CarcassoneAPI.Models.TileTypeTerrain", b =>
                 {
-                    b.Property<int>("TileTypeId")
-                        .HasColumnType("int");
+                    b.Property<int>("TileTypeTerrainId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
@@ -187,9 +196,14 @@ namespace CarcassoneAPI.Migrations
                     b.Property<int?>("TileTypeComponentId")
                         .HasColumnType("int");
 
-                    b.HasKey("TileTypeId", "Position");
+                    b.Property<int>("TileTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TileTypeTerrainId");
 
                     b.HasIndex("TileTypeComponentId");
+
+                    b.HasIndex("TileTypeId");
 
                     b.ToTable("TileTypeTerrains");
                 });

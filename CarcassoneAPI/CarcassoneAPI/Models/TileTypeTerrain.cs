@@ -2,7 +2,7 @@
 {
     public class TileTypeTerrain
     {
-        //public int Id { get; set; }
+        public int TileTypeTerrainId { get; set; }
         public TilePosition Position { get; set; }
         public TerrainType TerrainType { get; set; }
 

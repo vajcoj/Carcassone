@@ -5,7 +5,9 @@
     /// </summary>
     public class TileComponent
     {
-        public bool IsOpen { get; set; } 
+        public int TileComponentId { get; set; }
+        public bool IsOpen { get; set; }
+        public TerrainType TerrainType { get; set; }
         public TileTypeComponent TileTypeComponent { get; set; }
         public int TileTypeComponentId { get; set; }
         public Tile Tile { get; set; }
