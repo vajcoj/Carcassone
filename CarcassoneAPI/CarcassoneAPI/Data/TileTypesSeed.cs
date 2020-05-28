@@ -39,7 +39,7 @@ namespace CarcassoneAPI.Data
                     new List<TilePosition> { TilePosition.Bottom } // field
               ),
 
-              new TileType("Castle3_Road", "castle3road", 2,
+              new TileType("Castle3_Road", "castle3road", 3,
                     TerrainType.Castle,
                     TerrainType.Castle, TerrainType.Castle, TerrainType.Castle,
                     TerrainType.Castle, TerrainType.Castle, TerrainType.Castle,
@@ -51,7 +51,7 @@ namespace CarcassoneAPI.Data
                     new List<TilePosition> { TilePosition.BottomLeft } // field left
               ),
 
-               new TileType("Castle4", "castle4", 1,
+               new TileType("Castle4", "castle4", 2,
                     TerrainType.Castle,
                     TerrainType.Castle, TerrainType.Castle, TerrainType.Castle,
                     TerrainType.Castle, TerrainType.Castle, TerrainType.Castle,
@@ -106,11 +106,11 @@ namespace CarcassoneAPI.Data
                     TerrainType.Field, TerrainType.Road, TerrainType.Field,
                     new List<TilePosition> { TilePosition.Top }, // road T
                     new List<TilePosition> { TilePosition.Right }, // road R
-                    new List<TilePosition> { TilePosition.Bottom }, // road B
                     new List<TilePosition> { TilePosition.Left }, // road L
                     new List<TilePosition> { TilePosition.TopRight, TilePosition.RightTop }, // field TR
-                    new List<TilePosition> { TilePosition.Bottom,  TilePosition.RightBottom, TilePosition.LeftBottom }, // field R
-                    new List<TilePosition> { TilePosition.LeftTop, TilePosition.TopLeft } // field LT
+                    new List<TilePosition> { TilePosition.LeftTop, TilePosition.TopLeft }, // field LT
+                    new List<TilePosition> { TilePosition.Bottom,  TilePosition.RightBottom, TilePosition.LeftBottom } // field R
+                    
                 ),
 
                 new TileType("Castle1_Road1", "castle1road1", 2,
@@ -143,6 +143,7 @@ namespace CarcassoneAPI.Data
                     TerrainType.Field, TerrainType.Field, TerrainType.Field,
                     TerrainType.Field, TerrainType.Field, TerrainType.Field,
                     TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    new List<TilePosition> { TilePosition.Center },
                     new List<TilePosition> { TilePosition.Top, TilePosition.Right, TilePosition.Left, TilePosition.Bottom } // field
                ),
 
@@ -152,10 +153,10 @@ namespace CarcassoneAPI.Data
                     TerrainType.Field, TerrainType.Field, TerrainType.Field,
                     TerrainType.Field, TerrainType.Road, TerrainType.Field,
                     TerrainType.Field, TerrainType.Field, TerrainType.Field,
+                    new List<TilePosition> { TilePosition.Center },
                     new List<TilePosition> { TilePosition.Top, TilePosition.Right, TilePosition.Left, TilePosition.BottomLeft, TilePosition.BottomRight }, // field
                     new List<TilePosition> { TilePosition.Bottom } // road B
                ),
-
 
             };
         }
