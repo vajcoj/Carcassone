@@ -9,7 +9,6 @@ namespace CarcassoneAPI.Services.Interface
     {
         Task<IEnumerable<TilePuttedDTO>> GetAllTilesOfBoard(int boardId);
         Task<Tile> GetTile(int boardId, int x, int y);
-        Task<bool> PutTile(Tile tile);
         Task<TileToPutDTO> GetTileToPut(int boardId);
         Task<bool> ValidateTerrain(int boardId, TilePuttedDTO tile);
         Task<bool> CreateBoard(Board board);

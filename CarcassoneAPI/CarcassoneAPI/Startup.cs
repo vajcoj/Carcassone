@@ -1,6 +1,8 @@
 using AutoMapper;
 using CarcassoneAPI.Data;
 using CarcassoneAPI.Helpers;
+using CarcassoneAPI.Repositories;
+using CarcassoneAPI.Repositories.Interface;
 using CarcassoneAPI.Services;
 using CarcassoneAPI.Services.Interface;
 using Microsoft.AspNetCore.Builder;
@@ -30,10 +32,13 @@ namespace CarcassoneAPI
         {
             services.AddDbContext<DataContext>(con => con.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            //services.AddDbContext<DataContext>(ServiceLifetime.Transient);
+            // repositories
+            services.AddTransient<ITileRepository, TileRepository>();
 
+            // services
             services.AddTransient<IBoardService, BoardService>();
             services.AddTransient<ITileTypeService, TileTypeService>();
+            services.AddScoped<IPutTileService, PutTileService>();
 
             services.AddControllers();
 

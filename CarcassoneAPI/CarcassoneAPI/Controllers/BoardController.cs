@@ -14,12 +14,14 @@ namespace CarcassoneAPI.Controllers
     {
         private readonly IBoardService _boardService;
         private readonly ITileTypeService _tileTypeService;
+        private readonly IPutTileService _putTileService;
         private readonly IMapper _mapper;
 
-        public BoardController(IBoardService boardService, ITileTypeService tileTypeService, IMapper mapper)
+        public BoardController(IBoardService boardService, ITileTypeService tileTypeService, IPutTileService putTileService, IMapper mapper)
         {
             _boardService = boardService;
             _tileTypeService = tileTypeService;
+            _putTileService = putTileService;
             _mapper = mapper;
         }
 
@@ -79,7 +81,7 @@ namespace CarcassoneAPI.Controllers
 
             Tile record = _mapper.Map<TilePuttedDTO, Tile>(tile);
 
-            if (await _boardService.PutTile(record))
+            if (await _putTileService.PutTile(record))
             {
                 return Ok(); // CreatedAt
             }

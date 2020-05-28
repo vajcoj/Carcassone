@@ -24,13 +24,30 @@ namespace CarcassoneAPI.Models
 
     public static class TileExtensions
     {
-        public static TerrainType GetTerrain(this Tile tile, TilePosition position)
+        private static TileTypeTerrain GetRotatedTerrain(this Tile tile, TilePosition position)
         {
-            var terr = tile.TileType.Terrains.Where(t => t.Position.Rotate(tile.Rotation) == position).FirstOrDefault();
+            var terr = tile.TileType.Terrains.Where(t => t.Position.Rotate(tile.Rotation) == position).SingleOrDefault();
+
+            return terr;
+        }
+
+        public static TerrainType GetTerrainAt(this Tile tile, TilePosition position)
+        {
+            var terr = tile.GetRotatedTerrain(position);
 
             var ret = terr != null ? terr.TerrainType : TerrainType.Void;
 
             return ret;
         }
+
+        public static TileComponent GetComponentAt(this Tile tile, TilePosition position)
+        {
+            var terr = tile.GetRotatedTerrain(position);
+
+            var comp = tile.Components.Where(c => c.TileTypeComponent.Terrains.Contains(terr)).SingleOrDefault();
+
+            return comp;
+        }
+
     }
 }

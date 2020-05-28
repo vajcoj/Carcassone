@@ -94,27 +94,6 @@ namespace CarcassoneAPI.Services
             return availableTypes;
         }
 
-        public async Task<bool> PutTile(Tile tile)
-        {
-            var type = await _context.TileTypes
-                .Include(t => t.Components)
-                .FirstOrDefaultAsync(w => w.TileTypeId == tile.TileTypeId);
-
-            tile.Components = new List<TileComponent>();
-
-            foreach (var typeComponent in type.Components)
-            {
-                tile.Components.Add(new TileComponent
-                {
-                    Tile = tile,
-                    TileTypeComponent = typeComponent,
-                    IsOpen = true
-                });     
-            }
-
-            _context.Tiles.Add(tile);
-            return await _context.SaveChangesAsync() > 0;
-        }
 
         public async Task<bool> ValidateTerrain(int boardId, TilePuttedDTO tile)
         {
@@ -137,10 +116,10 @@ namespace CarcassoneAPI.Services
                 .Where(t => t.BoardId == boardId && t.X == x - 1 && t.Y == y)
                 .FirstOrDefaultAsync();
 
-            var terrainOfTop = tileTop?.GetTerrain(TilePosition.Bottom) ?? TerrainType.Void;
-            var terrainOfRight = tileRight?.GetTerrain(TilePosition.Left) ?? TerrainType.Void;
-            var terrainOfBottom = tileBottom?.GetTerrain(TilePosition.Top) ?? TerrainType.Void;
-            var terrainOfLeft = tileLeft?.GetTerrain(TilePosition.Right) ?? TerrainType.Void;
+            var terrainOfTop = tileTop?.GetTerrainAt(TilePosition.Bottom) ?? TerrainType.Void;
+            var terrainOfRight = tileRight?.GetTerrainAt(TilePosition.Left) ?? TerrainType.Void;
+            var terrainOfBottom = tileBottom?.GetTerrainAt(TilePosition.Top) ?? TerrainType.Void;
+            var terrainOfLeft = tileLeft?.GetTerrainAt(TilePosition.Right) ?? TerrainType.Void;
 
             if (terrainOfTop != tile.Top && terrainOfTop != TerrainType.Void) return false;
             if (terrainOfRight != tile.Right && terrainOfRight != TerrainType.Void) return false;
