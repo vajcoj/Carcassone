@@ -64,8 +64,8 @@ namespace CarcassoneAPI.Services
             var neighbourComponent = neighbour.GetComponentAt(neighbourPosition);
             var component = tile.GetComponentAt(position);
 
-            var bcComponent = _boardComponentRepository.Get(component.BoardComponentId);
-            var bcNeighbour = _boardComponentRepository.Get(neighbourComponent.BoardComponentId);
+            var bcComponent = _boardComponentRepository.Get(component.BoardComponentId) ?? component.BoardComponent;
+            var bcNeighbour = _boardComponentRepository.Get(neighbourComponent.BoardComponentId) ?? neighbourComponent.BoardComponent;
             var bcMerged = bcNeighbour;
 
             // join new component to existing bc
@@ -91,8 +91,8 @@ namespace CarcassoneAPI.Services
                 var tcNeighbourLeft = neighbour.GetComponentAt(neighbourPosition.GetPositionLeftOfMiddle());
                 var tcTileRight = tile.GetComponentAt(position.GetPositionRightOfMiddle());
 
-                var bcTileRight = _boardComponentRepository.Get(tcTileRight.BoardComponentId);
-                var bcNeighbourLeft = _boardComponentRepository.Get(tcNeighbourLeft.BoardComponentId);
+                var bcTileRight = _boardComponentRepository.Get(tcTileRight.BoardComponentId) ?? tcTileRight.BoardComponent;
+                var bcNeighbourLeft = _boardComponentRepository.Get(tcNeighbourLeft.BoardComponentId) ?? tcNeighbourLeft.BoardComponent;
                 var bcMerged1 = bcNeighbourLeft;
 
                 // join new component to existing bc
@@ -109,9 +109,9 @@ namespace CarcassoneAPI.Services
                 // connect second field - neighbour left from the road and new tile right from the road
                 var tcNeighbourRight = neighbour.GetComponentAt(neighbourPosition.GetPositionRightOfMiddle());
                 var tcTileLeft = tile.GetComponentAt(position.GetPositionLeftOfMiddle());
-                
-                var bcTileLeft = _boardComponentRepository.Get(tcTileLeft.BoardComponentId);
-                var bcNeighbourRight = _boardComponentRepository.Get(tcNeighbourRight.BoardComponentId);
+
+                var bcTileLeft = _boardComponentRepository.Get(tcTileLeft.BoardComponentId) ?? tcTileLeft.BoardComponent;
+                var bcNeighbourRight = _boardComponentRepository.Get(tcNeighbourRight.BoardComponentId) ?? tcNeighbourRight.BoardComponent;
                 var bcMerged2 = bcNeighbourRight;
 
                 // join new component to existing bc
