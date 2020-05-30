@@ -63,15 +63,16 @@ namespace CarcassoneAPI.Data
             builder.Entity<TileComponent>()
                 .HasOne(c => c.TileTypeComponent)
                 .WithMany()
-                //.HasForeignKey(c => c.TileTypeComponentId)
+                .HasForeignKey(c => c.TileTypeComponentId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
 
             builder.Entity<TileComponent>()
                 .HasOne(c => c.BoardComponent)
                 .WithMany(b => b.Components)
+                .HasForeignKey(c => c.BoardComponentId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired(false);
+                .IsRequired();
 
         }
     }

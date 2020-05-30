@@ -34,6 +34,7 @@ namespace CarcassoneAPI
 
             // repositories
             services.AddTransient<ITileRepository, TileRepository>();
+            services.AddTransient<IBoardComponentRepository, BoardComponentRepository>();
 
             // services
             services.AddTransient<IBoardService, BoardService>();

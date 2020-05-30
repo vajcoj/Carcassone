@@ -8,6 +8,7 @@ namespace CarcassoneAPI.Models
         public TerrainType TerrainType { get; set; }
         public bool IsOpen { get; set; } // computed from all sub-components (jen get???)
         public int Points { get; set; }
+        public bool IsDeleted { get; set; }
 
         public Board Board { get; set; }
         public int BoardId { get; set; }

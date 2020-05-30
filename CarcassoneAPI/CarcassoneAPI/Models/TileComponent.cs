@@ -13,7 +13,7 @@
         public Tile Tile { get; set; }
         public int TileId { get; set; }
         public BoardComponent BoardComponent { get; set; }
-        public int? BoardComponentId { get; set; }
+        public int BoardComponentId { get; set; }
 
         public TileComponent() { }
 
