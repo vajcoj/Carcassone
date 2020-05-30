@@ -20,7 +20,8 @@ namespace CarcassoneAPI.Repositories
         public override BoardComponent Get(int id)
         {
             var bc = _entities
-                .Include(bc => bc.Components)
+                .Include(bc => bc.Components).ThenInclude(c => c.TileTypeComponent).ThenInclude(t => t.Terrains)
+                .Include(bc => bc.Components).ThenInclude(c => c.Tile)
                 .SingleOrDefault(bc => bc.BoardComponentId == id && !bc.IsDeleted);
 
             return bc;

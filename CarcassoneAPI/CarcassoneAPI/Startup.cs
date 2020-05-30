@@ -39,7 +39,7 @@ namespace CarcassoneAPI
             // services
             services.AddTransient<IBoardService, BoardService>();
             services.AddTransient<ITileTypeService, TileTypeService>();
-            services.AddScoped<IPutTileService, PutTileService>();
+            services.AddTransient<IPutTileService, PutTileService>();
 
             services.AddControllers();
 
