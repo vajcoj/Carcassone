@@ -3,7 +3,6 @@ using CarcassoneAPI.Models;
 using CarcassoneAPI.Repositories.Interface;
 using CarcassoneAPI.Services.Interface;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,7 +32,6 @@ namespace CarcassoneAPI.Services
        
             // create new board components for those components of current tile, which were not connecteed to any board component
             CreateBoardComponentsForOrphans(tile);
-
 
             await CheckClosedMonasteries(tile.BoardId);
 
@@ -83,102 +81,60 @@ namespace CarcassoneAPI.Services
             // connect components in middle of tile side
             var neighbourComponent = neighbour.GetComponentAt(neighbourPosition);
             var component = tile.GetComponentAt(position);
+            GetMergedComponent(neighbourComponent, component, out BoardComponent bcMerged);
 
-            var bcComponent = _boardComponentRepository.Get(component.BoardComponentId) ?? component.BoardComponent;
-            var bcNeighbour = _boardComponentRepository.Get(neighbourComponent.BoardComponentId) ?? neighbourComponent.BoardComponent;
-            var bcMerged = bcNeighbour;
-
-            // join new component to existing bc
-            if (bcComponent != null) // TODO out variable???
-            {
-                bcMerged = MergeBoardComponents(bcComponent, bcNeighbour);
-            }
-
-            bcMerged.Components.Add(component);
-            component.BoardComponent = bcMerged;
-            component.BoardComponentId = bcMerged.BoardComponentId;
-     
             // get terrain type on connected side
             var terrain = neighbour.GetTerrainAt(neighbourPosition);
-
-            // connect fields besides the road
+          
             if (terrain == TerrainType.Road)
             {
-                bool isClosed = IsRoadClosed(bcMerged);
-                bcMerged.IsOpen = !isClosed;
+                CheckIsRoadClosed(bcMerged);
 
-                if (isClosed)
-                {
-                    bcMerged.Points = bcMerged.Components.Count(); // should be tiles count
-                }
-
-                // connect first field - neighbour right from the road and new tile left from the road
+                // connect first field beside the road
                 var tcNeighbourLeft = neighbour.GetComponentAt(neighbourPosition.GetPositionLeftOfMiddle());
                 var tcTileRight = tile.GetComponentAt(position.GetPositionRightOfMiddle());
+                GetMergedComponent(tcNeighbourLeft, tcTileRight, out _);
 
-                var bcTileRight = _boardComponentRepository.Get(tcTileRight.BoardComponentId) ?? tcTileRight.BoardComponent;
-                var bcNeighbourLeft = _boardComponentRepository.Get(tcNeighbourLeft.BoardComponentId) ?? tcNeighbourLeft.BoardComponent;
-                var bcMerged1 = bcNeighbourLeft;
-
-                // join new component to existing bc
-                if (bcTileRight != null) 
-                {
-                    bcMerged1 = MergeBoardComponents(bcTileRight, bcNeighbourLeft);
-                }
-
-                bcMerged1.Components.Add(tcTileRight);
-                tcTileRight.BoardComponent = bcMerged1;
-                tcTileRight.BoardComponentId = bcMerged1.BoardComponentId;
-
-
-                // connect second field - neighbour left from the road and new tile right from the road
+                // connect second field beside the road
                 var tcNeighbourRight = neighbour.GetComponentAt(neighbourPosition.GetPositionRightOfMiddle());
                 var tcTileLeft = tile.GetComponentAt(position.GetPositionLeftOfMiddle());
-
-                var bcTileLeft = _boardComponentRepository.Get(tcTileLeft.BoardComponentId) ?? tcTileLeft.BoardComponent;
-                var bcNeighbourRight = _boardComponentRepository.Get(tcNeighbourRight.BoardComponentId) ?? tcNeighbourRight.BoardComponent;
-                var bcMerged2 = bcNeighbourRight;
-
-                // join new component to existing bc
-                if (bcTileLeft != null)
-                {
-                    bcMerged2 = MergeBoardComponents(bcTileLeft, bcNeighbourRight);
-                }
-
-                bcMerged2.Components.Add(tcTileLeft);
-                tcTileLeft.BoardComponent = bcMerged2;
-                tcTileLeft.BoardComponentId = bcMerged2.BoardComponentId;
+                GetMergedComponent(tcNeighbourRight, tcTileLeft, out _);
 
             }
             else if (terrain == TerrainType.Castle)
             {
-                bool isClosed = await IsCastleClosed(bcMerged, tile.X, tile.Y);
+                await CheckIsCastleClosed(bcMerged, tile.X, tile.Y);
+            }
+        }
 
-                bcMerged.IsOpen = !isClosed;
+        private void GetMergedComponent(TileComponent neighbourComponent, TileComponent component, out BoardComponent merged)
+        {
+            var bcComponent = _boardComponentRepository.Get(component.BoardComponentId) ?? component.BoardComponent;
+            var bcNeighbour = _boardComponentRepository.Get(neighbourComponent.BoardComponentId) ?? neighbourComponent.BoardComponent;
+            merged = bcNeighbour;
 
-                if (isClosed)
-                {
-                    bcMerged.Points = bcMerged.Components.Count(); // should be tiles count
-                }
+            // join new component to existing bc
+            if (bcComponent != null)
+            {
+                merged = MergeBoardComponents(bcComponent, bcNeighbour);
             }
 
+            merged.Components.Add(component);
+            component.BoardComponent = merged;
+            component.BoardComponentId = merged.BoardComponentId;
         }
 
         private BoardComponent MergeBoardComponents(BoardComponent bcTile, BoardComponent bcNeighbour)
         {
             if (bcTile.BoardComponentId == bcNeighbour.BoardComponentId)
             {
-                System.Console.WriteLine($"Components alredy connected. {bcTile.BoardComponentId}");
+                // Components are alredy connected.
                 return bcNeighbour;
             }
-
-            System.Console.WriteLine($"Joining two global components {bcTile.BoardComponentId} and {bcNeighbour.BoardComponentId}");
 
             var tcs = new List<TileComponent>();
             tcs.AddRange(bcTile.Components);
             tcs.AddRange(bcNeighbour.Components);
-            bcTile.Components = null;
-            bcNeighbour.Components = null;
 
             // TODO: - don't create new bc - use one of the two components instead
             var merged = new BoardComponent
@@ -197,9 +153,9 @@ namespace CarcassoneAPI.Services
             return merged;
         }
 
-        public bool IsRoadClosed(BoardComponent bc)
+        public void CheckIsRoadClosed(BoardComponent bc)
         {
-            if (bc.TerrainType != TerrainType.Road) return false;
+            if (bc.TerrainType != TerrainType.Road) return;
 
             // road is closed when it has two components with only one terrain (road end)
             var groupRoadsWithOneEnd = bc.Components
@@ -207,15 +163,19 @@ namespace CarcassoneAPI.Services
                 .GroupBy(count => count)
                 .FirstOrDefault(w => w.Key == 1);
                 
-            if (groupRoadsWithOneEnd == null) { return false;  }
+            if (groupRoadsWithOneEnd == null) { return;  }
 
             var countOfComponentsWithRoadEnd = groupRoadsWithOneEnd.Count();
 
-            return countOfComponentsWithRoadEnd > 1;
+            if (countOfComponentsWithRoadEnd > 1)
+            {
+                bc.Points = bc.Components.Count(); // should be tiles count
+            }
         }
-        public async Task<bool> IsCastleClosed(BoardComponent bc, int currentTileX, int currentTileY)
+
+        public async Task CheckIsCastleClosed(BoardComponent bc, int currentTileX, int currentTileY)
         {
-            if (bc.TerrainType != TerrainType.Castle) return false;
+            if (bc.TerrainType != TerrainType.Castle) return;
 
             // castle is closed if each component has a neighbouring tile on each tile side
             foreach (var component in bc.Components)
@@ -231,34 +191,36 @@ namespace CarcassoneAPI.Services
                 {
                     bool existNeighbour = await _tileRepository.ExistTile(bc.BoardId, tile.X, tile.Y - 1);
                     bool isClosedByCurrentTile = tile.X == currentTileX && tile.Y - 1 == currentTileY;
-                    if (!existNeighbour && !isClosedByCurrentTile) return false;
+                    if (!existNeighbour && !isClosedByCurrentTile) return;
                 }
 
                 if (tile.GetComponentAt(TilePosition.Right).TileTypeComponentId == component.TileTypeComponentId)
                 {
                     bool existNeighbour = await _tileRepository.ExistTile(bc.BoardId, tile.X + 1, tile.Y);
                     bool isClosedByCurrentTile = tile.X + 1 == currentTileX && tile.Y == currentTileY;
-                    if (!existNeighbour && !isClosedByCurrentTile) return false;
+                    if (!existNeighbour && !isClosedByCurrentTile) return;
                 }
 
                 if (tile.GetComponentAt(TilePosition.Bottom).TileTypeComponentId == component.TileTypeComponentId)
-
                 {
                     bool existNeighbour = await _tileRepository.ExistTile(bc.BoardId, tile.X, tile.Y + 1);
                     bool isClosedByCurrentTile = tile.X == currentTileX && tile.Y + 1 == currentTileY;
-                    if (!existNeighbour && !isClosedByCurrentTile) return false;
+                    if (!existNeighbour && !isClosedByCurrentTile) return;
                 }
 
                 if (tile.GetComponentAt(TilePosition.Left).TileTypeComponentId == component.TileTypeComponentId)
                 {
                     bool existNeighbour = await _tileRepository.ExistTile(bc.BoardId, tile.X - 1, tile.Y);
                     bool isClosedByCurrentTile = tile.X - 1 == currentTileX && tile.Y == currentTileY;
-                    if (!existNeighbour && !isClosedByCurrentTile) return false;
+                    if (!existNeighbour && !isClosedByCurrentTile) return;
                 }
             }
 
-            return true;
+            // castle is closed
+            bc.IsOpen = false;
+            bc.Points = bc.Components.Count(); // should be tiles count
         }
+
         public async Task CheckClosedMonasteries(int boardId)
         {
             var monasteries = await _boardComponentRepository.GetOpenMonasteries(boardId);
