@@ -3,6 +3,7 @@ using CarcassoneAPI.Models;
 using CarcassoneAPI.Repositories.Interface;
 using CarcassoneAPI.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,17 +14,17 @@ namespace CarcassoneAPI.Services
     {
         private readonly DataContext _context;
         private readonly ITileRepository _tileRepository;
+        private readonly IBoardComponentRepository _boardComponentRepository;
 
-        public PutTileService(DataContext context, ITileRepository tileRepository)
+        public PutTileService(DataContext context, ITileRepository tileRepository, IBoardComponentRepository boardComponentRepository)
         {
             _context = context;
             _tileRepository = tileRepository;
+            _boardComponentRepository = boardComponentRepository;
         }
 
         public async Task<bool> PutTile(Tile tile)
         {
-            //var board = await GetBoardWithTiles(tile.BoardId);
-
             await CreateTileComponents(tile);
 
             // connect to neoghbouring tiles
@@ -32,13 +33,13 @@ namespace CarcassoneAPI.Services
             var neighbourBottom = await _tileRepository.GetTileAt(tile.BoardId, tile.X, tile.Y + 1);
             var neighbourLeft = await _tileRepository.GetTileAt(tile.BoardId, tile.X - 1, tile.Y);
 
-            if (neighbourTop != null) {  ConnectComponents(TilePosition.Top, tile, neighbourTop); }
+            if (neighbourTop != null) { ConnectComponents(TilePosition.Top, tile, neighbourTop); }
             if (neighbourRight != null) { ConnectComponents(TilePosition.Right, tile, neighbourRight); }
             if (neighbourBottom != null) { ConnectComponents(TilePosition.Bottom, tile, neighbourBottom); }
             if (neighbourLeft != null) { ConnectComponents(TilePosition.Left, tile, neighbourLeft); }
 
             // if any tile component was not connected to a bord component, create new board component
-            var orphanComponents = tile.Components.Where(c => c.BoardComponentId == null);
+            var orphanComponents = tile.Components.Where(c => c.BoardComponent == null);
             foreach (var tc in orphanComponents)
             {
                 var boardComponent = new BoardComponent
@@ -49,13 +50,13 @@ namespace CarcassoneAPI.Services
                     TerrainType = tc.TileTypeComponent.TerrainType,
                     Components = new List<TileComponent> { tc }
                 };
-                _context.BoardComponents.Add(boardComponent);
+                _boardComponentRepository.Add(boardComponent);
             }
 
             return await _context.SaveChangesAsync() > 0;
         }
 
-        private async Task ConnectComponents(TilePosition position, Tile tile, Tile neighbour)
+        private void ConnectComponents(TilePosition position, Tile tile, Tile neighbour)
         {
             var neighbourPosition = position.GetOpposite();
 
@@ -63,65 +64,83 @@ namespace CarcassoneAPI.Services
             var neighbourComponent = neighbour.GetComponentAt(neighbourPosition);
             var component = tile.GetComponentAt(position);
 
-            if (component.BoardComponentId == null)
+            var bcComponent = _boardComponentRepository.Get(component.BoardComponentId);
+            var bcNeighbour = _boardComponentRepository.Get(neighbourComponent.BoardComponentId);
+            var bcMerged = bcNeighbour;
+
+            // join new component to existing bc
+            if (bcComponent != null) // TODO out variable???
             {
-                component.BoardComponentId = neighbourComponent.BoardComponentId;
+                bcMerged = MergeBoardComponents(bcComponent, bcNeighbour);
             }
-            else
-            {
-                await MergeBoardComponents(component.BoardComponentId, neighbourComponent.BoardComponentId);
-            }
+
+            string pos = Enum.GetName(typeof(TilePosition), position);
+            System.Console.WriteLine($"Adding component to merged bc: {bcMerged.BoardComponentId} from {pos} \n");
+
+            bcMerged.Components.Add(component);
+            component.BoardComponent = bcMerged;
+            component.BoardComponentId = bcMerged.BoardComponentId;
 
             // get terrain type on connected side
             var terrain = neighbour.GetTerrainAt(neighbourPosition);
 
             // connect fields besides the road
             if (terrain == TerrainType.Road)
-            {
+            {/*
                 // connect first field
                 var fieldNeighbourLeft = neighbour.GetComponentAt(neighbourPosition.GetPositionLeftOfMiddle());
                 var fieldTileRight = tile.GetComponentAt(position.GetPositionRightOfMiddle());
 
-                if (fieldTileRight.BoardComponentId == null)
-                {
-                    fieldTileRight.BoardComponentId = fieldNeighbourLeft.BoardComponentId;
-                }
-                else
-                {
-                    await MergeBoardComponents(fieldTileRight.BoardComponentId, fieldNeighbourLeft.BoardComponentId);
-                }
+                var bcTileRightField = _boardComponentRepository.Get(fieldTileRight.BoardComponentId);
+                var bcNeighbourLeftField = _boardComponentRepository.Get(fieldNeighbourLeft.BoardComponentId);
+
+                // join new component to existing bc
+                
 
                 // connect second field
                 var fieldNeighbourRight = neighbour.GetComponentAt(neighbourPosition.GetPositionRightOfMiddle());
                 var fieldTileLeft = tile.GetComponentAt(position.GetPositionLeftOfMiddle());
 
-                if (fieldTileLeft.BoardComponentId == null)
-                {
-                    fieldTileLeft.BoardComponentId = fieldNeighbourRight.BoardComponentId;
-                }
-                else
-                {
-                    await MergeBoardComponents(fieldTileLeft.BoardComponentId, fieldNeighbourRight.BoardComponentId);
-                }
- 
+                var bcTileLeftField = _boardComponentRepository.Get(fieldTileLeft.BoardComponentId);
+                var bcNeighbourRightField = _boardComponentRepository.Get(fieldNeighbourRight.BoardComponentId);
+
+                // join new component to existing bc
+                */
             }
-            
+
         }
 
-        private async Task MergeBoardComponents(int? boardComponentId1, int? boardComponentId2)
+        private BoardComponent MergeBoardComponents(BoardComponent bcTile, BoardComponent bcNeighbour)
         {
-            System.Console.WriteLine($"joining two global components {boardComponentId1} and {boardComponentId2}");
+            if (bcTile.BoardComponentId == bcNeighbour.BoardComponentId)
+            {
+                System.Console.WriteLine($"Components alredy connected. {bcTile.BoardComponentId}");
+                return bcNeighbour;
+            }
 
-            //var component1 = await _context.BoardComponents.SingleOrDefaultAsync(c => c.BoardComponentId == boardComponentId1);
-            //var component2 = await _context.BoardComponents.SingleOrDefaultAsync(c => c.BoardComponentId == boardComponentId2);
+            System.Console.WriteLine($"Joining two global components {bcTile.BoardComponentId} and {bcNeighbour.BoardComponentId}");
 
-            //// validation for board id and terrain ???
+            var tcs = new List<TileComponent>();
+            tcs.AddRange(bcTile.Components);
+            tcs.AddRange(bcNeighbour.Components);
+            bcTile.Components = null;
+            bcNeighbour.Components = null;
 
-            //component2.Components.ToList().AddRange(component1.Components);
+            // TODO: - don't create new bc - use one of the two components instead
+            var merged = new BoardComponent
+            {
+                BoardId = bcNeighbour.BoardId,
+                TerrainType = bcNeighbour.TerrainType,
+                Components = tcs,
+                IsOpen = true,
+                Points = 0,
+            };
 
-            //component1.Components = null;
+            _boardComponentRepository.Add(merged);
+            _boardComponentRepository.Remove(bcTile);
+            _boardComponentRepository.Remove(bcNeighbour);
 
-            //_context.BoardComponents.Remove(component1);
+            return merged;
         }
 
         private async Task CreateTileComponents(Tile tile)
