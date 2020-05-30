@@ -86,26 +86,44 @@ namespace CarcassoneAPI.Services
 
             // connect fields besides the road
             if (terrain == TerrainType.Road)
-            {/*
-                // connect first field
-                var fieldNeighbourLeft = neighbour.GetComponentAt(neighbourPosition.GetPositionLeftOfMiddle());
-                var fieldTileRight = tile.GetComponentAt(position.GetPositionRightOfMiddle());
+            {
+                // connect first field - neighbour right from the road and new tile left from the road
+                var tcNeighbourLeft = neighbour.GetComponentAt(neighbourPosition.GetPositionLeftOfMiddle());
+                var tcTileRight = tile.GetComponentAt(position.GetPositionRightOfMiddle());
 
-                var bcTileRightField = _boardComponentRepository.Get(fieldTileRight.BoardComponentId);
-                var bcNeighbourLeftField = _boardComponentRepository.Get(fieldNeighbourLeft.BoardComponentId);
+                var bcTileRight = _boardComponentRepository.Get(tcTileRight.BoardComponentId);
+                var bcNeighbourLeft = _boardComponentRepository.Get(tcNeighbourLeft.BoardComponentId);
+                var bcMerged1 = bcNeighbourLeft;
 
                 // join new component to existing bc
+                if (bcTileRight != null) 
+                {
+                    bcMerged1 = MergeBoardComponents(bcTileRight, bcNeighbourLeft);
+                }
+
+                bcMerged1.Components.Add(tcTileRight);
+                tcTileRight.BoardComponent = bcMerged1;
+                tcTileRight.BoardComponentId = bcMerged1.BoardComponentId;
+
+
+                // connect second field - neighbour left from the road and new tile right from the road
+                var tcNeighbourRight = neighbour.GetComponentAt(neighbourPosition.GetPositionRightOfMiddle());
+                var tcTileLeft = tile.GetComponentAt(position.GetPositionLeftOfMiddle());
                 
-
-                // connect second field
-                var fieldNeighbourRight = neighbour.GetComponentAt(neighbourPosition.GetPositionRightOfMiddle());
-                var fieldTileLeft = tile.GetComponentAt(position.GetPositionLeftOfMiddle());
-
-                var bcTileLeftField = _boardComponentRepository.Get(fieldTileLeft.BoardComponentId);
-                var bcNeighbourRightField = _boardComponentRepository.Get(fieldNeighbourRight.BoardComponentId);
+                var bcTileLeft = _boardComponentRepository.Get(tcTileLeft.BoardComponentId);
+                var bcNeighbourRight = _boardComponentRepository.Get(tcNeighbourRight.BoardComponentId);
+                var bcMerged2 = bcNeighbourRight;
 
                 // join new component to existing bc
-                */
+                if (bcTileLeft != null)
+                {
+                    bcMerged2 = MergeBoardComponents(bcTileLeft, bcNeighbourRight);
+                }
+
+                bcMerged2.Components.Add(tcTileLeft);
+                tcTileLeft.BoardComponent = bcMerged2;
+                tcTileLeft.BoardComponentId = bcMerged2.BoardComponentId;
+
             }
 
         }
