@@ -8,5 +8,6 @@ namespace CarcassoneAPI.Repositories.Interface
         public Task<Tile> GetTileWithTileType(int id);
         Task<Tile> GetTileAt(int boardId, int x, int y);
         Task<bool> ExistTile(int boardId, int x, int y);
+        Task<int> GetCountOfSurrondingTiles(Tile tile);
     }
 }

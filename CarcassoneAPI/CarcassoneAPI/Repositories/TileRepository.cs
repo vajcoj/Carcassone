@@ -3,6 +3,7 @@ using CarcassoneAPI.Models;
 using CarcassoneAPI.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CarcassoneAPI.Repositories
@@ -44,6 +45,19 @@ namespace CarcassoneAPI.Repositories
                 .AnyAsync(t => t.Board.BoardId == boardId && t.X == x && t.Y == y);
 
             return existsTile;
+        }
+
+        public async Task<int> GetCountOfSurrondingTiles(Tile tile)
+        {
+            var count = await _entities
+                .Where(w => w.BoardId == tile.BoardId &&
+                    w.X >= tile.X - 1 &&
+                    w.X <= tile.X + 1 &&
+                    w.Y >= tile.Y - 1 &&
+                    w.Y <= tile.Y + 1)
+                .CountAsync();
+
+            return count;
         }
     }
 }

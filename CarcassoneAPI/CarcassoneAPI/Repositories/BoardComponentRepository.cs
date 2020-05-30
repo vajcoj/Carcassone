@@ -33,5 +33,15 @@ namespace CarcassoneAPI.Repositories
             component.IsDeleted = true;
             //_entities.Update(component);
         }
+
+        public Task<List<BoardComponent>> GetOpenMonasteries(int boardId)
+        {
+            var monasteries = _entities
+                .Include(c => c.Components).ThenInclude(c => c.Tile)
+                .Where(c => c.TerrainType == TerrainType.Monastery && c.IsOpen)
+                .ToListAsync();
+
+            return monasteries;
+        }
     }
 }

@@ -25,13 +25,17 @@ namespace CarcassoneAPI.Services
 
         public async Task<bool> PutTile(Tile tile)
         {
+            // construct Tile object
             await CreateTileComponents(tile);
 
+            // connect to board components via neighbouring tiles
             await ConnectToNeihbours(tile);
        
+            // create new board components for those components of current tile, which were not connecteed to any board component
             CreateBoardComponentsForOrphans(tile);
 
-            // check closed monasteries
+
+            await CheckClosedMonasteries(tile.BoardId);
 
             return await _context.SaveChangesAsync() > 0;
         }
@@ -89,9 +93,6 @@ namespace CarcassoneAPI.Services
             {
                 bcMerged = MergeBoardComponents(bcComponent, bcNeighbour);
             }
-
-            string pos = Enum.GetName(typeof(TilePosition), position);
-            System.Console.WriteLine($"Adding component to merged bc: {bcMerged.BoardComponentId} from {pos} \n");
 
             bcMerged.Components.Add(component);
             component.BoardComponent = bcMerged;
@@ -201,15 +202,17 @@ namespace CarcassoneAPI.Services
             if (bc.TerrainType != TerrainType.Road) return false;
 
             // road is closed when it has two components with only one terrain (road end)
-            var countOfComponentsWithRoadEnd = bc.Components
+            var groupRoadsWithOneEnd = bc.Components
                 .Select(c => c.TileTypeComponent.Terrains.Count())
                 .GroupBy(count => count)
-                .FirstOrDefault(w => w.Key == 1)
-                .Count();
+                .FirstOrDefault(w => w.Key == 1);
+                
+            if (groupRoadsWithOneEnd == null) { return false;  }
+
+            var countOfComponentsWithRoadEnd = groupRoadsWithOneEnd.Count();
 
             return countOfComponentsWithRoadEnd > 1;
         }
-
         public async Task<bool> IsCastleClosed(BoardComponent bc, int currentTileX, int currentTileY)
         {
             if (bc.TerrainType != TerrainType.Castle) return false;
@@ -223,8 +226,6 @@ namespace CarcassoneAPI.Services
                 {
                     await _tileRepository.GetTileWithTileType(tile.TileId);
                 }
-
-                Console.WriteLine($"Closing caste on {tile.X}, {tile.Y}");
 
                 if (tile.GetComponentAt(TilePosition.Top).TileTypeComponentId == component.TileTypeComponentId)
                 {
@@ -258,8 +259,23 @@ namespace CarcassoneAPI.Services
 
             return true;
         }
+        public async Task CheckClosedMonasteries(int boardId)
+        {
+            var monasteries = await _boardComponentRepository.GetOpenMonasteries(boardId);
 
-        // if any tile component was not connected to a board component, create new board component
+            foreach (var monastery in monasteries)
+            {
+                var tile = monastery.Components.FirstOrDefault().Tile;
+
+                int count = await _tileRepository.GetCountOfSurrondingTiles(tile);
+                if (count >= 8)
+                {
+                    monastery.IsOpen = false;
+                    monastery.Points = 9;
+                }
+            }
+        }
+
         private void CreateBoardComponentsForOrphans(Tile tile)
         {
             var orphanComponents = tile.Components.Where(c => c.BoardComponent == null);
